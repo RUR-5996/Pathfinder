@@ -10,6 +10,7 @@ package org.usfirst.frc.team3630.robot;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import jaci.pathfinder.modifiers.TankModifier;
@@ -19,6 +20,7 @@ import jaci.pathfinder.Trajectory;
 import jaci.pathfinder.Waypoint;
 import org.usfirst.frc.team3630.drive.TeleopDriveExecutor;
 import org.usfirst.frc.team3630.drive.AutoDriveExecutor;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -41,9 +43,13 @@ public class Robot extends IterativeRobot {
 	public static OI oi = new OI();
 	public static AHRS ahrs;
 	
+	public static Timer timer;
+	
+	public static PowerDistributionPanel panel;
+	
 	public enum Destinations
 	{
-		LEFT, RIGHT;
+		LEFT, RIGHT, SLALOM, DONOTHING;
 	}
 	
 	SendableChooser <Destinations> autoChooser;
@@ -54,9 +60,11 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void robotInit() {
-		autoChooser = new SendableChooser<Destinations>(); //create a chooser on the Smart Dashboard
-		autoChooser.addDefault("left" , Destinations.LEFT);
+		autoChooser = new SendableChooser<Destinations>();
+		autoChooser.addDefault("do nothing", Destinations.DONOTHING);
+		autoChooser.addObject("left" , Destinations.LEFT);
 		autoChooser.addObject("right", Destinations.RIGHT);
+		autoChooser.addObject("slalom", Destinations.SLALOM);
 		SmartDashboard.putData("auto chooser", autoChooser);
 		
 		RobotMap.configureTalon(RobotMap.five);
@@ -66,12 +74,13 @@ public class Robot extends IterativeRobot {
 		RobotMap.configureTalon(RobotMap.threeR);
 		RobotMap.configureTalon(RobotMap.twoL);
 		
-		RobotMap.oneR.setSensorPhase(false);
+		RobotMap.oneR.setSensorPhase(true); //this one was outputting negative - maybe some issues in pathfinder
 		RobotMap.twoL.setSensorPhase(false);
 		
 		ahrs = new AHRS(SPI.Port.kMXP);
-		
+		timer = new Timer();
 
+		panel = new PowerDistributionPanel(0);
 	}
 
 	/**
@@ -117,6 +126,9 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("encoderR", RobotMap.getTicks(RobotMap.oneR));
 		SmartDashboard.putNumber("gyro", ahrs.getAngle());
 		teleopDriveExecutor.execute();
+		SmartDashboard.putNumber("speed", teleopDriveExecutor.currentSpeed);
+		SmartDashboard.putNumber("power", panel.getVoltage());
+//		SmartDashboard.putNumber("touchless encoder", RobotMap.touchless.getVoltage());
 	}
 
 	/**
@@ -126,4 +138,27 @@ public class Robot extends IterativeRobot {
 	public void testPeriodic() {
 	}
 
+	public void autoLogic() //run in autoInit
+	{
+		if(autoChooser.getSelected()==Destinations.DONOTHING)
+		{
+			autoSequence.basicSequence();
+		}
+		else if(autoChooser.getSelected()==Destinations.LEFT)
+		{
+			autoSequence.left();
+		}
+		else if(autoChooser.getSelected()==Destinations.RIGHT)
+		{
+			autoSequence.right();
+		}
+		else if(autoChooser.getSelected()==Destinations.SLALOM)
+		{
+			autoSequence.slalom();
+		}
+		else
+		{
+			autoSequence.doNothing();
+		}
+	}
 }

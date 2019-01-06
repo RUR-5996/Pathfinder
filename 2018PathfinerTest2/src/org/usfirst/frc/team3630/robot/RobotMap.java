@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.AnalogInput;
 
 /**
  * The RobotMap is a mapping from the ports sensors and actuators are wired into
@@ -21,19 +22,21 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
  * floating around.
  */
 public class RobotMap {
-	public static WPI_TalonSRX oneR = new WPI_TalonSRX(4); //change these for your Talon IDs
+	public static WPI_TalonSRX oneR = new WPI_TalonSRX(4); //works 1
 	public static WPI_TalonSRX twoL = new WPI_TalonSRX(11);
 	public static WPI_TalonSRX threeR = new WPI_TalonSRX(7);
 	public static WPI_TalonSRX fourL = new WPI_TalonSRX(10);
 	public static WPI_TalonSRX five = new WPI_TalonSRX(5);
 	public static WPI_TalonSRX six = new WPI_TalonSRX(6);
 	
-	private static SpeedControllerGroup right = new SpeedControllerGroup(oneR, threeR); //we can use Master and Slave talons since we have SRX...
+//	public static AnalogInput touchless = new AnalogInput(0);
+	
+	private static SpeedControllerGroup right = new SpeedControllerGroup(oneR, threeR);
 	private static SpeedControllerGroup left = new SpeedControllerGroup(twoL, fourL);
 	
-	public static DifferentialDrive drive = new DifferentialDrive(left, right); //creating only one drive -> I had some problems when creating two drives
+	public static DifferentialDrive drive = new DifferentialDrive(left, right);
 	
-	public static void configureTalon(TalonSRX talon) //basic configuration for SRX
+	public static void configureTalon(TalonSRX talon)
 	{
 		talon.configNominalOutputForward(0, Constants.timeoutMs);
 		talon.configNominalOutputReverse(0, Constants.timeoutMs);
@@ -48,11 +51,11 @@ public class RobotMap {
 		talon.configPeakCurrentLimit(30, Constants.timeoutMs);
 		talon.configPeakCurrentDuration(200, Constants.timeoutMs);
 	}
-	public static int getTicks(TalonSRX talon) //returns position of encoders
+	public static int getTicks(TalonSRX talon)
 	{
 		return talon.getSelectedSensorPosition(0);
 	}
-	public static void resetEncoders() //resets encoders
+	public static void resetEncoders()
 	{
 		RobotMap.oneR.setSelectedSensorPosition(0);
 		RobotMap.twoL.setSelectedSensorPosition(0);

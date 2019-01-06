@@ -82,7 +82,7 @@ public class OI {
 	
 	public double getRightY()
 	{
-		return deadzone(controller.getY(Hand.kRight));
+		return -deadzone(controller.getY(Hand.kRight));
 	}
 	
 	public double getRightX()

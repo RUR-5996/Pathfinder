@@ -34,9 +34,11 @@ public class Robot extends IterativeRobot {
   private Talon right1 = new Talon(1);
   private Talon left2 = new Talon(2);
   private Talon right2 = new Talon(3);
+  private SpeedControllerGroup left = new SpeedControllerGroup(left1, left2);
+  private SpeedControllerGroup right = new SpeedControllerGroup(right1, right2);
 
   public MecanumDrive mecanum = new MecanumDrive(left1, left2, right1, right2); //first drive
-  public DifferentialDrive tank = new DifferentialDrive(left1, right1); //second drive
+  public DifferentialDrive tank = new DifferentialDrive(left, right); //second drive
   //when 2 drives are defined, the code is leaving off one iteration of itself
 
   /**
